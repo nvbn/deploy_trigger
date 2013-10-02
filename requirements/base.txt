@@ -1,0 +1,11 @@
+django
+django-bower
+south
+django-extensions
+django-discover-runner
+pillow
+redis
+PyGithub
+python-social-auth
+django-braces
+-e git+https://github.com/ui/django-rq.git\#egg=django-rq
