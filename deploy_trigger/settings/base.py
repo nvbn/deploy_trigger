@@ -111,6 +111,10 @@ INSTALLED_APPS = (
     'djangobower',
     'django_rq',
     'social.apps.django_app.default',
+    'rest_framework',
+    'discover_runner',
+
+    'tasks',
 )
 
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
@@ -121,6 +125,8 @@ BOWER_INSTALLED_APPS = (
     'font-awesome',
     'underscore',
 )
+
+TEST_RUNNER = 'discover_runner.DiscoverRunner'
 
 AUTHENTICATION_BACKENDS = (
     'social.backends.github.GithubOAuth2',
