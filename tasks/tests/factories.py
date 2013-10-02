@@ -1,6 +1,6 @@
 import factory
 from django.contrib.auth.models import User
-from ..models import Task
+from ..models import Task, Job
 
 
 class UserFactory(factory.DjangoModelFactory):
@@ -20,3 +20,11 @@ class TaskFactory(factory.DjangoModelFactory):
     name = factory.Sequence(lambda n: 'name{}'.format(n))
     server = factory.Sequence(lambda n: 'server{}'.format(n))
     script = factory.Sequence(lambda n: 'script{}'.format(n))
+
+
+class JobFactory(factory.DjangoModelFactory):
+    """Job factory"""
+    FACTORY_FOR = Job
+
+    task = factory.SubFactory(TaskFactory)
+    triggered = Job.TRIGGERED_PUSH

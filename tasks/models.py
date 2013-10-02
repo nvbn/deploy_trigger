@@ -43,3 +43,44 @@ class Task(models.Model):
         private_key = BytesIO()
         key.write_private_key(private_key)
         self.private_key = private_key.getvalue().decode()
+
+
+class Job(models.Model):
+    """Task job"""
+    STATUS_NEW = 0
+    STATUS_IN_PROGRESS = 1
+    STATUS_SUCCESS = 2
+    STATUS_FAILED = 3
+    STATUSES = (
+        (STATUS_NEW, _('new')),
+        (STATUS_IN_PROGRESS, _('in progress')),
+        (STATUS_SUCCESS, _('success')),
+        (STATUS_FAILED, _('failed')),
+    )
+
+    TRIGGERED_MANUAL = 0
+    TRIGGERED_PUSH = 1
+    TRIGGERED_TYPES = (
+        (TRIGGERED_MANUAL, _('manual')),
+        (TRIGGERED_PUSH, _('push')),
+    )
+
+    task = models.ForeignKey(Task, verbose_name=_('status'))
+    status = models.PositiveSmallIntegerField(
+        default=STATUS_NEW, choices=STATUSES, verbose_name=_('status'),
+    )
+    input = models.TextField(blank=True, null=True, verbose_name=_('input'))
+    output = models.TextField(blank=True, null=True, verbose_name=_('output'))
+    started = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('started'),
+    )
+    finished = models.DateTimeField(
+        blank=True, null=True, verbose_name=_('finished'),
+    )
+    triggered = models.PositiveSmallIntegerField(
+        choices=TRIGGERED_TYPES, verbose_name=_('triggred'),
+    )
+
+    class Meta:
+        verbose_name = _('Job')
+        verbose_name_plural = _('Jobs')
