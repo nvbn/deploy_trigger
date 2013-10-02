@@ -18,7 +18,7 @@ class TaskFactory(factory.DjangoModelFactory):
     user = factory.SubFactory(UserFactory)
     branch = factory.Sequence(lambda n: 'branch{}'.format(n))
     name = factory.Sequence(lambda n: 'name{}'.format(n))
-    server = factory.Sequence(lambda n: 'server{}'.format(n))
+    server = factory.Sequence(lambda n: 'server@host:{}'.format(n))
     script = factory.Sequence(lambda n: 'script{}'.format(n))
 
 

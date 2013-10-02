@@ -3,6 +3,7 @@ import paramiko
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from .exceptions import NotAllowedWithThisStatus
 
 
 class Task(models.Model):
@@ -44,6 +45,18 @@ class Task(models.Model):
         key.write_private_key(private_key)
         self.private_key = private_key.getvalue().decode()
 
+    def get_connection_args(self) -> dict:
+        """Get connection args"""
+        args = {}
+        user, host = self.server.split('@')
+        args['hostname'] = host
+        args['username'] = user
+        if ':' in host:
+            host, port = host.split(':')
+            args['hostname'] = host
+            args['port'] = int(port)
+        return args
+
 
 class Job(models.Model):
     """Task job"""
@@ -84,3 +97,17 @@ class Job(models.Model):
     class Meta:
         verbose_name = _('Job')
         verbose_name_plural = _('Jobs')
+
+    @property
+    def connection(self) -> paramiko.SSHClient:
+        """Get ssh connection"""
+        if self.status != self.STATUS_IN_PROGRESS:
+            raise NotAllowedWithThisStatus(self)
+
+        if not hasattr(self, '_connection'):
+            self._connection = paramiko.SSHClient()
+            self._connection.set_missing_host_key_policy(
+                paramiko.AutoAddPolicy,
+            )
+            self._connection.connect(**self.task.get_connection_args())
+        return self._connection
