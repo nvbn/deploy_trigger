@@ -19,9 +19,8 @@ class TaskModelCase(TestCase):
     def test_generate_keys_on_save(self):
         """Test generate keys on save"""
         task = factories.TaskFactory()
-        task.save()
-        task.private_key.should.not_be.none
-        task.public_key.should.not_be.none
+        task.private_key.should.not_be.equal('')
+        task.public_key.should.not_be.equal('')
 
     def test_get_connection_args(self):
         """Test get connectiona args"""

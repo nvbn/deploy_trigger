@@ -57,6 +57,12 @@ class Task(models.Model):
             args['port'] = int(port)
         return args
 
+    def save(self, *args, **kwargs):
+        """Generate key if not present and save"""
+        if not (self.private_key or self.public_key):
+            self.generate_keys()
+        return super(Task, self).save(*args, **kwargs)
+
 
 class Job(models.Model):
     """Task job"""
