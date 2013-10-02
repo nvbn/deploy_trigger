@@ -1,7 +1,7 @@
 import sure
-from mock import MagicMock
+from unittest.mock import MagicMock
 from django.test import TestCase
-from ..exceptions import NotAllowedWithThisStatus
+from ..exceptions import NotAllowedWithThisStatus, ConnectionFailed
 from .. import models
 from . import factories
 
@@ -66,3 +66,10 @@ class JobModelCase(TestCase):
         """
         job = factories.JobFactory(status=models.Job.STATUS_NEW)
         (lambda: job.connection).should.throw(NotAllowedWithThisStatus)
+
+    def test_raise_when_connection_failed(self):
+        """Test raise exception when connection failed"""
+        job = factories.JobFactory(status=models.Job.STATUS_IN_PROGRESS)
+        models.paramiko.SSHClient.return_value.connect.side_effect =\
+            Exception()
+        (lambda: job.connection).should.throw(ConnectionFailed)

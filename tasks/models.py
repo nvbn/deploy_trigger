@@ -3,7 +3,7 @@ import paramiko
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
-from .exceptions import NotAllowedWithThisStatus
+from .exceptions import NotAllowedWithThisStatus, ConnectionFailed
 
 
 class Task(models.Model):
@@ -115,5 +115,8 @@ class Job(models.Model):
             self._connection.set_missing_host_key_policy(
                 paramiko.AutoAddPolicy,
             )
-            self._connection.connect(**self.task.get_connection_args())
+            try:
+                self._connection.connect(**self.task.get_connection_args())
+            except Exception as e:
+                raise ConnectionFailed(e)
         return self._connection

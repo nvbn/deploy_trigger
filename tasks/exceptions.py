@@ -7,3 +7,7 @@ class NotAllowedWithThisStatus(Exception):
                 job, job.status,
             )
         )
+
+
+class ConnectionFailed(Exception):
+    """Connection failed exception"""
