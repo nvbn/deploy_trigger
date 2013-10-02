@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
 from .exceptions import NotAllowedWithThisStatus, ConnectionFailed
+from . import logger
 
 
 class Task(models.Model):
@@ -120,3 +121,23 @@ class Job(models.Model):
             except Exception as e:
                 raise ConnectionFailed(e)
         return self._connection
+
+    def perform(self):
+        """Perform job"""
+        if self.status != self.STATUS_NEW:
+            raise NotAllowedWithThisStatus(self)
+        self.status = self.STATUS_IN_PROGRESS
+        self.input = self.task.script
+        try:
+            stdout = self.connection.exec_command(self.input)[1]
+            self.output = stdout.read()
+            self.status = self.STATUS_SUCCESS
+        except ConnectionFailed:
+            self.status = self.STATUS_FAILED
+            logger.log('Connection failed', exc_info=True, extra={
+                'job': self,
+            })
+        except Exception as e:
+            self.status = self.STATUS_FAILED
+            logger.exception('Job failed: {}'.format(e))
+        self.save()
