@@ -2,7 +2,7 @@ import os
 
 
 PROJECT_ROOT = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "../../..//"),
+    os.path.join(os.path.dirname(__file__), "../../"),
 )
 
 
@@ -38,7 +38,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static_collected')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -46,9 +46,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_ROOT, 'static'),
 )
 
 # List of finder classes that know how to find static files in
@@ -74,6 +72,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'social.apps.django_app.middleware.SocialAuthExceptionMiddleware',
 )
 
 ROOT_URLCONF = 'deploy_trigger.urls'
@@ -82,9 +81,7 @@ ROOT_URLCONF = 'deploy_trigger.urls'
 WSGI_APPLICATION = 'deploy_trigger.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(PROJECT_ROOT, 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -94,6 +91,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.core.context_processors.static",
     "django.core.context_processors.tz",
+    "django.core.context_processors.request",
     "django.contrib.messages.context_processors.messages",
     'social.apps.django_app.context_processors.backends',
     'social.apps.django_app.context_processors.login_redirect',
@@ -110,7 +108,6 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'south',
     'django_extensions',
-    'discover_runner',
     'djangobower',
     'django_rq',
     'social.apps.django_app.default',
@@ -123,11 +120,7 @@ BOWER_INSTALLED_APPS = (
     'bootstrap',
     'font-awesome',
     'underscore',
-    'backbone',
-    'backbone-tastypie',
 )
-
-TEST_RUNNER = 'discover_runner.DiscoverRunner'
 
 AUTHENTICATION_BACKENDS = (
     'social.backends.github.GithubOAuth2',
