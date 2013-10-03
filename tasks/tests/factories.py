@@ -1,13 +1,6 @@
 import factory
-from django.contrib.auth.models import User
+from accounts.tests.factories import UserFactory
 from ..models import Task, Job
-
-
-class UserFactory(factory.DjangoModelFactory):
-    """User factory"""
-    FACTORY_FOR = User
-
-    username = factory.Sequence(lambda n: 'user {}'.format(n))
 
 
 class TaskFactory(factory.DjangoModelFactory):

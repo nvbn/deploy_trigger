@@ -21,5 +21,12 @@ class RepositoryViewSet(LoginRequiredMixin, ViewSet):
 
     def list(self, request: Request, *args, **kwargs) -> Response:
         """List available repositories"""
-        request.user
-        return Response([{'a': 1}])
+        github_user = request.user.github.get_user()
+        avatar = github_user.avatar_url
+        return Response([
+            {
+                'name': repo.full_name,
+                'avatar': avatar,
+            }
+            for repo in github_user.get_repos('owner')
+        ])
