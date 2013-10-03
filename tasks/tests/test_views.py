@@ -3,6 +3,7 @@ import sure
 from django.test import TestCase
 from rest_framework.test import APIClient
 from accounts.models import User
+from .. import views
 from . import factories
 
 
@@ -85,3 +86,41 @@ class JobViewCase(BaseViewCase):
         response = self.api_client.get(self.url)
         len(response.data).should.be.equal(0)
 
+
+class JobTriggerViewCase(TestCase):
+    """Job trigger view case"""
+
+    def setUp(self):
+        self.api_client = APIClient()
+        self.url = '/api/v1/triggers/'
+        self._mock_job()
+
+    def _mock_job(self):
+        """Mock rq job"""
+        self._orig_perform_job = views.perform_job
+        views.perform_job = MagicMock()
+
+    def tearDown(self):
+        views.perform_job = self._orig_perform_job
+
+    def test_create_job(self):
+        """Test create job"""
+        factories.TaskFactory(name='owner/test')
+        response = self.api_client.post(self.url, data={
+            'repository': {
+                'name': 'test',
+                'owner': {'name': 'owner'},
+            }
+        }, format='json')
+        response.status_code.should.be.equal(201)
+        views.perform_job.delay.call_count.should.be.equal(1)
+
+    def test_not_exists_repo(self):
+        """Test trigger for not exists repo"""
+        response = self.api_client.post(self.url, data={
+            'repository': {
+                'name': 'test',
+                'owner': {'name': 'owner'},
+            }
+        }, format='json')
+        response.status_code.should.be.equal(404)
