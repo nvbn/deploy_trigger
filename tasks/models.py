@@ -3,6 +3,7 @@ import paramiko
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.db import models
+from django.conf import settings
 from .exceptions import NotAllowedWithThisStatus, ConnectionFailed
 from . import logger
 
@@ -12,7 +13,7 @@ class Task(models.Model):
     repository = models.CharField(
         max_length=300, verbose_name=_('repository'),
     )
-    user = models.ForeignKey(User, verbose_name=_('user'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_('user'))
     created = models.DateTimeField(
         auto_now_add=True, verbose_name=_('created'),
     )

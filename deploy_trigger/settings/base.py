@@ -115,6 +115,7 @@ INSTALLED_APPS = (
     'discover_runner',
 
     'tasks',
+    'accounts',
 )
 
 BOWER_COMPONENTS_ROOT = os.path.join(PROJECT_ROOT, 'components')
@@ -137,3 +138,5 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/github/'
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['public_repo', 'repo']
+
+AUTH_USER_MODEL = 'accounts.User'
