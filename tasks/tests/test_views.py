@@ -64,3 +64,24 @@ class TaskViewCase(BaseViewCase):
         factories.TaskFactory.create_batch(20)
         response = self.api_client.get(self.url)
         len(response.data).should.be.equal(0)
+
+
+class JobViewCase(BaseViewCase):
+    """Job view case"""
+
+    def setUp(self):
+        super(JobViewCase, self).setUp()
+        self.url = '/api/v1/jobs/'
+
+    def test_receive_self_jobs(self):
+        """Test receive self jobs"""
+        factories.JobFactory.create_batch(20, task__user=self.user)
+        response = self.api_client.get(self.url)
+        len(response.data).should.be.equal(20)
+
+    def test_not_return_other_user_jobs(self):
+        """Test not return other user jobs"""
+        factories.JobFactory.create_batch(20)
+        response = self.api_client.get(self.url)
+        len(response.data).should.be.equal(0)
+
