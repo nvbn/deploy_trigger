@@ -3,16 +3,15 @@ import sure
 from django.test import TestCase
 from rest_framework.test import APIClient
 from accounts.models import User
+from . import factories
 
 
-class RepositoryViewCase(TestCase):
-    """Repository view case"""
+class BaseViewCase(TestCase):
+    """Base view case"""
 
     def setUp(self):
         self.api_client = APIClient()
-        self._mock_github()
         self._create_user()
-        self.url = '/api/v1/repositories/'
 
     def _create_user(self):
         """Create user and authenticate"""
@@ -21,6 +20,15 @@ class RepositoryViewCase(TestCase):
             username='test',
             password='test',
         )
+
+
+class RepositoryViewCase(BaseViewCase):
+    """Repository view case"""
+
+    def setUp(self):
+        self._mock_github()
+        self.url = '/api/v1/repositories/'
+        super(RepositoryViewCase, self).setUp()
 
     def _mock_github(self):
         """Mock github client"""
@@ -36,3 +44,23 @@ class RepositoryViewCase(TestCase):
             [MagicMock()] * 10
         response = self.api_client.get(self.url)
         len(response.data).should.be.equal(10)
+
+
+class TaskViewCase(BaseViewCase):
+    """Task view case"""
+
+    def setUp(self):
+        super(TaskViewCase, self).setUp()
+        self.url = '/api/v1/tasks/'
+
+    def test_receive_self_tasks(self):
+        """Test receive self tasks"""
+        factories.TaskFactory.create_batch(20, user=self.user)
+        response = self.api_client.get(self.url)
+        len(response.data).should.be.equal(20)
+
+    def test_not_return_other_user_tasks(self):
+        """Test not return other user tasks"""
+        factories.TaskFactory.create_batch(20)
+        response = self.api_client.get(self.url)
+        len(response.data).should.be.equal(0)

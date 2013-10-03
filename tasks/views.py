@@ -9,6 +9,12 @@ class TaskViewSet(LoginRequiredMixin, ModelViewSet):
     """Task model view set"""
     model = Task
 
+    def get_queryset(self):
+        """Return only user owned tasks"""
+        return self.model.objects.filter(
+            user=self.request.user,
+        )
+
 
 class JobViewSet(LoginRequiredMixin, ModelViewSet):
     """Job model view set"""
